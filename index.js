@@ -6,11 +6,17 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-app.get("/", (req, res) => {
-  res.send("test");
-});
-
 const port = process.env.PORT || 3000;
+
+// Data structures
+const usernameStore = {};
+
+io.on("connection", (socket) => {
+  console.log(`User connected with socket id: ${socket.id}`);
+  socket.on("disconnect", (socket) => {
+    console.log(`User disconnected with socket id: ${socket.id}`);
+  });
+});
 
 server.listen(port, () => {
   console.log(`Server is up on port: ${port}`);
