@@ -1,11 +1,7 @@
 const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
-const {
-  handleJoinLobby,
-  handleGetLobbyDetails,
-  handleRoundStart,
-} = require("./helpers/utils");
+const { handleGetLobbyDetails, initGame } = require("./helpers/utils");
 
 const app = express();
 const server = http.createServer(app);
@@ -18,6 +14,7 @@ const io = socketIO(server, {
 const port = process.env.PORT || 3000;
 
 const MAX_PLAYERS = 20;
+const gameDataStore = {};
 
 io.use(async (socket, next) => {
   if (!socket.handshake.auth.username) {
@@ -40,7 +37,6 @@ io.on("connection", async (socket) => {
 
   if (numSocketsInLobby === MAX_PLAYERS) {
     socket.emit("joinLobbyResponse", { success: false });
-    socket.disconnect();
   }
 
   socket.join(socket.lobby);
@@ -61,8 +57,13 @@ io.on("connection", async (socket) => {
     await handleGetLobbyDetails(io, socket);
   });
 
-  socket.on("startGame", () => {
-    startRound(io, socket);
+  socket.on("startGameRequest", () => {
+    if (!socket.isHost) {
+      // Don't start game
+      socket.emit("startGameResponse", { success: false });
+      return;
+    }
+    initGame(socket);
   });
 });
 

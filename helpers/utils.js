@@ -1,55 +1,29 @@
-const MAX_PLAYERS = 8;
+test_tweet =
+  "What two jobs are fine on their own, but suspicious if you put them together?";
 
-const timerStore = {};
-const lobbyAnswerStore = {};
-
-const handleJoinLobby = async (io, socket, lobby) => {
-  const sockets = await io.in(lobby).fetchSockets();
-  const numPlayers = sockets.length;
-  if (numPlayers === MAX_PLAYERS) {
-    socket.emit("joinLobbyResponse", {
-      success: false,
-      message: "Lobby is full.",
-    });
-    return;
-  }
-
-  socket.join(lobby);
-  socket.emit("joinLobbyResponse", { success: true });
-  io.to(lobby).emit("lobbyUpdate", null);
-  return numPlayers;
-};
+const gameDataStore = {};
 
 const handleGetLobbyDetails = async (io, socket) => {
   const sockets = await io.in(socket.lobby).fetchSockets();
   const players = sockets.map((s) => socket.username);
-  socket.emit("getLobbyDetailsResponse", { players, lobby: socket.lobby });
+  const res = { players, lobby: socket.loby };
+  if (socket.isHost) {
+    res.isHost = true;
+  }
+  socket.emit("getLobbyDetailsResponse", res);
 };
 
-const startRound = (io, socket) => {
-  const timerStoreEntry = {
-    timer: 30,
-    lobby: socket.lobby,
+const initGame = (socket) => {
+  // Create a record in gameDataStore
+  gameDataStore[socket.lobby] = {
+    round: {
+      number: 1,
+    },
+    scores: {},
   };
-  lobbyAnswerStore[socket.lobby] = timerStoreEntry;
-  timerStoreEntry.intervalId = setInterval(() => {
-    if (timerStore[socket.lobby] && timerStore[socket.lobby].timer === 0) {
-      io.sockets.in(socket.lobby).emit("round1End");
-      clearInterval(timerStore[socket.lobby].intervalId);
-      delete timerStore[socket.lobby];
-    }
-
-    timerStore[socket.lobby].timer -= 1;
-  }, 1000);
-};
-
-const handleRoundAnswer = (io, socket, answer) => {
-  lobbyAnswerStore[socket.lobby][socket.id] = answer;
 };
 
 module.exports = {
-  handleRoundAnswer,
-  startRound,
-  handleJoinLobby,
+  initGame,
   handleGetLobbyDetails,
 };
