@@ -18,6 +18,12 @@ const io = socketIO(server, {
 const port = process.env.PORT || 3000;
 
 io.use(async (socket, next) => {
+  const sockets = await io.fetchSockets();
+  const socketAddresses = sockets.map((s) => s.handshake.address);
+  if (socketAddresses.includes(socket.handshake.address)) {
+    return next(new Error("This IP is already connected"));
+  }
+
   const username = socket.handshake.auth.username;
 
   if (!username) {
