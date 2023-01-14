@@ -13,7 +13,11 @@ const usernameStore = {};
 
 io.on("connection", (socket) => {
   console.log(`User connected with socket id: ${socket.id}`);
-  socket.on("disconnect", (socket) => {
+  console.log(socket.rooms);
+  socket.on("disconnect", () => {
+    console.log(usernameStore);
+    delete usernameStore[socket.id];
+    console.log(usernameStore);
     console.log(`User disconnected with socket id: ${socket.id}`);
   });
 
@@ -22,9 +26,9 @@ io.on("connection", (socket) => {
     socket.join(data.lobby);
 
     // For testing
-    socket
-      .to(data.lobby)
-      .emit("enteredLobby", { message: `Entered lobby: ${data.lobby}` });
+    socket.to(data.lobby).emit("enteredLobby", {
+      message: `${data.username} entered ${data.lobby}`,
+    });
   });
 });
 
