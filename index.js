@@ -1,7 +1,7 @@
 const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
-const { handleGetLobbyDetails, initGame } = require("./helpers/utils");
+const { initGame, getLobbyData } = require("./helpers/utils");
 
 const app = express();
 const server = http.createServer(app);
@@ -37,22 +37,17 @@ io.on("connection", async (socket) => {
   }
 
   if (numSocketsInLobby === MAX_PLAYERS) {
-    socket.emit("joinLobbyResponse", { success: false });
+    socket.emit("joinLobbyFailure", { success: false });
+	// todo: disconnect client from websocket
   }
 
   socket.join(socket.lobby);
-  io.to(socket.lobby).emit("lobbyUpdate");
 
-  // Log User Connection
+	// Broadcast to entire lobby
+  const lobbyData = await getLobbyData(io, socket);
+  io.to(socket.lobby).emit("lobbyUpdate", lobbyData); 
+
   console.log(`User ${socket.username} connected to lobby: ${socket.lobby}`);
-  // On socket disconnect
-  socket.on("disconnect", () => {
-    console.log(`User ${socket.username} disconnected.`);
-  });
-
-  socket.on("getLobbyDetailsRequest", async () => {
-    await handleGetLobbyDetails(io, socket);
-  });
 
   socket.on("startGameRequest", () => {
     if (!socket.isHost) {
@@ -64,6 +59,11 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("receiveAnsweer", () => {});
+
+  // On socket disconnect
+  socket.on("disconnect", () => {
+    console.log(`User ${socket.username} disconnected.`);
+  });
 });
 
 server.listen(port, () => {

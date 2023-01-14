@@ -3,15 +3,22 @@ test_tweet =
 
 const gameDataStore = {};
 
-const handleGetLobbyDetails = async (io, socket) => {
+const getLobbyData = async(io, socket) => {
   const sockets = await io.in(socket.lobby).fetchSockets();
   const players = sockets.map((s) => socket.username);
-  const res = { players, lobby: socket.lobby };
-  if (socket.isHost) {
-    res.isHost = true;
+
+  const output = {
+	players,
+	lobby: socket.lobby,
   }
-  socket.emit("getLobbyDetailsResponse", res);
-};
+
+  if (socket.isHost) {
+	Object.assign(output, {
+		isHost: true
+	});
+  }
+  return output;
+}
 
 const initGame = (socket) => {
   // Create a record in gameDataStore
@@ -25,5 +32,5 @@ const initGame = (socket) => {
 
 module.exports = {
   initGame,
-  handleGetLobbyDetails,
+  getLobbyData,
 };
