@@ -13,9 +13,10 @@ const handleJoinLobby = async (io, socket, lobby) => {
     });
     return;
   }
+
   socket.join(lobby);
   socket.emit("joinLobbyResponse", { success: true });
-  socket.to(lobby).emit("userJoinLobby");
+  socket.emit("userJoinLobby");
 };
 
 const handleGetLobbyDetails = async (io, socket) => {
