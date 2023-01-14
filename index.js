@@ -16,6 +16,16 @@ io.on("connection", (socket) => {
   socket.on("disconnect", (socket) => {
     console.log(`User disconnected with socket id: ${socket.id}`);
   });
+
+  socket.on("joinLobby", (data) => {
+    usernameStore[socket.id] = data.username;
+    socket.join(data.lobby);
+
+    // For testing
+    socket
+      .to(data.lobby)
+      .emit("enteredLobby", { message: `Entered lobby: ${data.lobby}` });
+  });
 });
 
 server.listen(port, () => {
