@@ -4,7 +4,7 @@ const socketIO = require("socket.io");
 const {
   handleJoinLobby,
   handleGetLobbyDetails,
-  handleStartGame,
+  handleRoundStart,
 } = require("./helpers/utils");
 
 const app = express();
@@ -41,7 +41,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("startGame", () => {
-    handleStartGame(io, socket);
+    handleRoundStart(io, socket);
   });
 });
 
