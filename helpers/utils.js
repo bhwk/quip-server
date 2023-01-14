@@ -20,10 +20,9 @@ const handleJoinLobby = async (io, socket, lobby) => {
 };
 
 const handleGetLobbyDetails = async (io, socket) => {
-  const [curr_room] = socket.rooms;
-  const sockets = await io.in(curr_room).fetchSockets();
+  const sockets = await io.in(socket.lobby).fetchSockets();
   const players = sockets.map((s) => socket.username);
-  socket.emit("getLobbyDetailsResponse", { players, lobby: curr_room });
+  socket.emit("getLobbyDetailsResponse", { players, lobby: socket.lobby });
 };
 
 const handleRoundStart = (io, socket) => {
