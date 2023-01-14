@@ -1,7 +1,7 @@
 const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
-const { initGame, getLobbyData } = require("./helpers/utils");
+const { initGame, generateLobbyData } = require("./helpers/utils");
 
 const app = express();
 const server = http.createServer(app);
@@ -16,6 +16,22 @@ const port = process.env.PORT || 3000;
 const MAX_PLAYERS = 20;
 const gameDataStore = {};
 
+/*
+  gameDataStore = {
+    "lobbyName": {
+      players: [
+        {
+          name: string,
+          isHost: boolean,
+          score: number,
+        }
+      ],
+      currentRound: number,
+    }
+  }
+*/
+
+
 io.use(async (socket, next) => {
   if (!socket.handshake.auth.username) {
     return next(new Error("Invalid username"));
@@ -29,33 +45,58 @@ io.use(async (socket, next) => {
 
 io.on("connection", async (socket) => {
   // Handle user joins/creates lobby
-  const socketsInLobby = await io.in(socket.lobby).fetchSockets();
-  const numSocketsInLobby = socketsInLobby.length;
+  const lobbyName = socket.lobby;
+  const username = socket.username;
 
-  if (numSocketsInLobby === 0) {
-    socket.isHost = true;
+  if (gameDataStore[lobbyName]) {
+    const containsPlayer = gameDataStore[lobbyName].players.reduce((acc, playerObj) => {
+      return playerObj.name === socket.username;
+    }, false);
+
+    console.log('containsPlayer', containsPlayer)
+
+    if (!containsPlayer) {
+      gameDataStore[lobbyName].players.push({
+        name: username,
+        isHost: false,
+        score: 0,
+      })
+    }
+  }
+  else {
+    Object.assign(gameDataStore, {
+      [lobbyName]: {
+        players: [
+          {
+            name: username,
+            isHost: true,
+            score: 0,
+          }
+        ],
+        currentRound: 0,
+      }
+    })
   }
 
-  if (numSocketsInLobby === MAX_PLAYERS) {
+  if (gameDataStore[lobbyName].players.length >= MAX_PLAYERS) {
     socket.emit("joinLobbyFailure", { success: false });
-	// todo: disconnect client from websocket
+    // todo: disconnect client from websocket
   }
 
   socket.join(socket.lobby);
 
 	// Broadcast to entire lobby
-  const lobbyData = await getLobbyData(io, socket);
-  io.to(socket.lobby).emit("lobbyUpdate", lobbyData); 
+  
+  io.to(socket.lobby).emit("lobbyUpdate", generateLobbyData(gameDataStore, lobbyName, username)); 
 
   console.log(`User ${socket.username} connected to lobby: ${socket.lobby}`);
 
-  socket.on("startGameRequest", () => {
+  socket.on("hostStartGame", () => {
     if (!socket.isHost) {
-      // Don't start game
-      socket.emit("startGameResponse", { success: false });
-      return;
+      return socket.emit("gameStart", { success: false });
     }
-    initGame(socket);
+
+    initGame(gameDataStore, socket);
   });
 
   socket.on("receiveAnsweer", () => {});
@@ -63,6 +104,19 @@ io.on("connection", async (socket) => {
   // On socket disconnect
   socket.on("disconnect", () => {
     console.log(`User ${socket.username} disconnected.`);
+
+    const isHost = gameDataStore[lobbyName].players.reduce((acc, u) => {
+      return (username === u.name) && u.isHost
+    });
+
+    if (!isHost) {
+      gameDataStore[lobbyName].players = gameDataStore[lobbyName].players.filter((u) => u.name !== username)
+      
+      io.to(socket.lobby).emit("lobbyUpdate", generateLobbyData(gameDataStore, lobbyName, username)); 
+      return
+    }
+
+
   });
 });
 

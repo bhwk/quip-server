@@ -1,26 +1,7 @@
 test_tweet =
   "What two jobs are fine on their own, but suspicious if you put them together?";
 
-const gameDataStore = {};
-
-const getLobbyData = async(io, socket) => {
-  const sockets = await io.in(socket.lobby).fetchSockets();
-  const players = sockets.map((s) => socket.username);
-
-  const output = {
-	players,
-	lobby: socket.lobby,
-  }
-
-  if (socket.isHost) {
-	Object.assign(output, {
-		isHost: true
-	});
-  }
-  return output;
-}
-
-const initGame = (socket) => {
+const initGame = (gameDataStore, socket) => {
   // Create a record in gameDataStore
   gameDataStore[socket.lobby] = {
     round: {
@@ -30,7 +11,16 @@ const initGame = (socket) => {
   };
 };
 
+const generateLobbyData = (gameDataStore, lobbyName, username) => {
+	return {
+    players: gameDataStore[lobbyName].players.map((u) => u.name),
+    isHost: gameDataStore[lobbyName].players.reduce((acc, u) => {
+      return (username === u.name) && u.isHost
+    }, false)
+  };
+}
+
 module.exports = {
   initGame,
-  getLobbyData,
+  generateLobbyData,
 };
