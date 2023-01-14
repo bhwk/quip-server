@@ -29,11 +29,14 @@ io.use(async (socket, next) => {
 
 io.on("connection", (socket) => {
   // Log User Connection
-  console.log(`User ${socket.username} connected`);
-
+  console.log(`User ${socket.username} connected to lobby: ${socket.lobby}`);
   // On socket disconnect
   socket.on("disconnect", () => {
     console.log(`User ${socket.username} disconnected.`);
+  });
+
+  socket.on("hello world", () => {
+    console.log("hello world");
   });
 
   socket.on("getLobbyDetailsRequest", async () => {
