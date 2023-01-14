@@ -35,6 +35,7 @@ io.on("connection", (socket) => {
     const sockets = await io.in(curr_room).fetchSockets();
     const players = sockets.map((s) => usernameStore[s.id]);
     socket.emit("receiveLobbyDetails", { players, lobby: curr_room });
+    console.log(socket.rooms);
   });
 });
 

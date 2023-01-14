@@ -5,8 +5,10 @@ const removeUser = (socket, usernameStore) => {
 };
 
 const joinLobby = (socket, lobby) => {
-  const [prev_room] = socket.rooms;
-  socket.leave(prev_room);
+  const [most_recent] = socket.rooms;
+  if (most_recent !== socket.id) {
+    socket.leave(most_recent);
+  }
   socket.join(lobby);
 };
 
