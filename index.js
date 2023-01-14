@@ -1,7 +1,7 @@
 const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
-const { initGame, generateLobbyData } = require("./helpers/utils");
+const { initGame, generateLobbyData, nextRound } = require("./helpers/utils");
 
 const app = express();
 const server = http.createServer(app);
@@ -19,10 +19,7 @@ const gameDataStore = {};
 /*
   gameDataStore = {
     "lobbyName": {
-      roundTimer: {
-        timer: number,
-        intervalId: number,
-      }
+      endTimer: number,
       players: [
         {
           name: string,
@@ -39,7 +36,7 @@ const gameDataStore = {};
         avatar: string
         retweets: number,
         likes: 0	
-      }
+      },
     }
   }
 */
@@ -54,6 +51,34 @@ io.use(async (socket, next) => {
 
   next();
 });
+
+setInterval(() => {
+  for (const lobby in gameDataStore) {
+    lobby.endTimer =
+      lobby.endTimer !== null ? Math.max(lobby.endTimer - 1, 0) : null;
+    const timeLeft = gameDataStore[lobby].endTimer;
+    const players = gameDataStore[lobby].players;
+    io.to(lobby).emit("gameUpdate", { timeLeft, players });
+
+    if (lobby.timer.endTimer === 0) {
+      const shouldContinue = nextRound(gameDataStore, lobby);
+      if (shouldContinue) {
+        const currentRound = gameDataStore[lobbyName].currentRound;
+        const totalRoundData = gameDataStore[lobbyName].totalRoundData;
+
+        const currentRoundData = totalRoundData[currentRound];
+
+        // remove current round data from total round data
+        gameDataStore[lobbyName].totalRoundData.splice(0, 1);
+
+        gameDataStore[lobbyName].endTimer = 30;
+        io.to(lobby).emit("roundStart", { roundData: currentRoundData });
+      } else {
+        io.to(lobby).emit("gameEnd", gameDataStore[lobby].players);
+      }
+    }
+  }
+}, 1000);
 
 io.on("connection", async (socket) => {
   // Handle user joins/creates lobby
@@ -80,10 +105,8 @@ io.on("connection", async (socket) => {
   } else {
     Object.assign(gameDataStore, {
       [lobbyName]: {
-        roundTimer: {
-          timer: null,
-          intervalId: null,
-        },
+        endTimer: null,
+        next: null,
         players: [
           {
             name: username,
@@ -132,23 +155,11 @@ io.on("connection", async (socket) => {
     // remove current round data from total round data
     gameDataStore[lobbyName].totalRoundData.splice(0, 1);
 
-    // Create round timer
-    gameDataStore[lobbyName].roundTimer.timer = 30;
-    gameDataStore[lobbyName].roundTimer.intervalId = setInterval(() => {
-      if (gameDataStore[lobbyName].roundTimer.timer <= 0) {
-        clearInterval(gameDataStore[lobbyName].roundTimer.intervalId);
-        // end round
-        // currentRound++
-        // if currentRound >= 5: end game
-        // else start vote
-      }
-      gameDataStore[lobbyName].roundTimer.timer -= 1;
-    }, 1000);
+    gameDataStore[lobbyName].endTimer = 30;
 
     socket.emit("gameStart", {
       success: true,
       roundData: currentRoundData,
-      roundTimer: gameDataStore[lobbyName].roundTimer.timer,
     });
   });
 
