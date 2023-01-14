@@ -19,6 +19,10 @@ const gameDataStore = {};
 /*
   gameDataStore = {
     "lobbyName": {
+      roundTimer: {
+        timer: number,
+        intervalId: number,
+      }
       players: [
         {
           name: string,
@@ -40,7 +44,6 @@ const gameDataStore = {};
   }
 */
 
-
 io.use(async (socket, next) => {
   if (!socket.handshake.auth.username) {
     return next(new Error("Invalid username"));
@@ -58,34 +61,40 @@ io.on("connection", async (socket) => {
   const username = socket.username;
 
   if (gameDataStore[lobbyName]) {
-    const containsPlayer = gameDataStore[lobbyName].players.reduce((acc, playerObj) => {
-      return playerObj.name === socket.username;
-    }, false);
+    const containsPlayer = gameDataStore[lobbyName].players.reduce(
+      (acc, playerObj) => {
+        return playerObj.name === socket.username;
+      },
+      false
+    );
 
-    console.log('containsPlayer', containsPlayer)
+    console.log("containsPlayer", containsPlayer);
 
     if (!containsPlayer) {
       gameDataStore[lobbyName].players.push({
         name: username,
         isHost: false,
         score: 0,
-      })
+      });
     }
-  }
-  else {
+  } else {
     Object.assign(gameDataStore, {
       [lobbyName]: {
+        roundTimer: {
+          timer: null,
+          intervalId: null,
+        },
         players: [
           {
             name: username,
             isHost: true,
             score: 0,
-          }
+          },
         ],
         currentRound: 0,
         totalRoundData: [],
-      }
-    })
+      },
+    });
   }
 
   if (gameDataStore[lobbyName].players.length >= MAX_PLAYERS) {
@@ -95,15 +104,22 @@ io.on("connection", async (socket) => {
 
   socket.join(socket.lobby);
 
-	// Broadcast to entire lobby
-  
-  io.to(socket.lobby).emit("lobbyUpdate", generateLobbyData(gameDataStore, lobbyName, username)); 
+  // Broadcast to entire lobby
+
+  io.to(socket.lobby).emit(
+    "lobbyUpdate",
+    generateLobbyData(gameDataStore, lobbyName, username)
+  );
 
   console.log(`User ${socket.username} connected to lobby: ${socket.lobby}`);
 
   socket.on("hostStartGame", () => {
-    if (!socket.isHost) {
-      return socket.emit("gameStart", { success: false });
+    const isHost = gameDataStore[lobbyName].players.reduce((acc, u) => {
+      return username === u.name && u.isHost;
+    }, false);
+
+    if (!isHost) {
+      socket.emit("gameStart", { success: false });
     }
 
     initGame(gameDataStore, lobbyName); // populates total round data
@@ -114,12 +130,26 @@ io.on("connection", async (socket) => {
     const currentRoundData = totalRoundData[currentRound];
 
     // remove current round data from total round data
-    gameDataStore[lobbyName].totalRoundData.splice(0, 1)
+    gameDataStore[lobbyName].totalRoundData.splice(0, 1);
 
-    socket.emit("gameStart", { 
-      success: false,
-      roundData: currentRoundData
-    })
+    // Create round timer
+    gameDataStore[lobbyName].roundTimer.timer = 30;
+    gameDataStore[lobbyName].roundTimer.intervalId = setInterval(() => {
+      if (gameDataStore[lobbyName].roundTimer.timer <= 0) {
+        // end round
+        // currentRound++
+        // if currentRound >= 5: end game
+        // else start vote
+        clearInterval(gameDataStore[lobbyName.roundTimer.intervalId]);
+      }
+      gameDataStore[lobbyName].roundTimer.timer -= 1;
+    }, 1000);
+
+    socket.emit("gameStart", {
+      success: true,
+      roundData: currentRoundData,
+      roundTimer: gameDataStore[lobbyName].roundTimer.timer,
+    });
   });
 
   socket.on("receiveAnsweer", () => {});
@@ -129,17 +159,20 @@ io.on("connection", async (socket) => {
     console.log(`User ${socket.username} disconnected.`);
 
     const isHost = gameDataStore[lobbyName].players.reduce((acc, u) => {
-      return (username === u.name) && u.isHost
+      return username === u.name && u.isHost;
     });
 
     if (!isHost) {
-      gameDataStore[lobbyName].players = gameDataStore[lobbyName].players.filter((u) => u.name !== username)
-      
-      io.to(socket.lobby).emit("lobbyUpdate", generateLobbyData(gameDataStore, lobbyName, username)); 
-      return
+      gameDataStore[lobbyName].players = gameDataStore[
+        lobbyName
+      ].players.filter((u) => u.name !== username);
+
+      io.to(socket.lobby).emit(
+        "lobbyUpdate",
+        generateLobbyData(gameDataStore, lobbyName, username)
+      );
+      return;
     }
-
-
   });
 });
 
