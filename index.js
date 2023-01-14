@@ -65,6 +65,8 @@ io.on("connection", async (socket) => {
     }
     initGame(socket);
   });
+
+  socket.on("receiveAnsweer", () => {});
 });
 
 server.listen(port, () => {
