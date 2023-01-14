@@ -6,7 +6,7 @@ const gameDataStore = {};
 const handleGetLobbyDetails = async (io, socket) => {
   const sockets = await io.in(socket.lobby).fetchSockets();
   const players = sockets.map((s) => socket.username);
-  const res = { players, lobby: socket.loby };
+  const res = { players, lobby: socket.lobby };
   if (socket.isHost) {
     res.isHost = true;
   }
