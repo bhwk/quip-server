@@ -31,6 +31,7 @@ io.on("connection", async (socket) => {
   // Handle user joins/creates lobby
   const socketsInLobby = await io.in(socket.lobby).fetchSockets();
   const numSocketsInLobby = socketsInLobby.length;
+
   if (numSocketsInLobby === 0) {
     socket.isHost = true;
   }
@@ -47,10 +48,6 @@ io.on("connection", async (socket) => {
   // On socket disconnect
   socket.on("disconnect", () => {
     console.log(`User ${socket.username} disconnected.`);
-  });
-
-  socket.on("hello world", () => {
-    console.log("hello world");
   });
 
   socket.on("getLobbyDetailsRequest", async () => {
