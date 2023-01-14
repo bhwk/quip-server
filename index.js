@@ -136,11 +136,11 @@ io.on("connection", async (socket) => {
     gameDataStore[lobbyName].roundTimer.timer = 30;
     gameDataStore[lobbyName].roundTimer.intervalId = setInterval(() => {
       if (gameDataStore[lobbyName].roundTimer.timer <= 0) {
+        clearInterval(gameDataStore[lobbyName.roundTimer.intervalId]);
         // end round
         // currentRound++
         // if currentRound >= 5: end game
         // else start vote
-        clearInterval(gameDataStore[lobbyName.roundTimer.intervalId]);
       }
       gameDataStore[lobbyName].roundTimer.timer -= 1;
     }, 1000);
@@ -152,7 +152,9 @@ io.on("connection", async (socket) => {
     });
   });
 
-  socket.on("receiveAnsweer", () => {});
+  socket.on("receiveAnswer", (answer) => {
+    const playerIdx = gameDataStore[lobbyName].players.findIndex;
+  });
 
   // On socket disconnect
   socket.on("disconnect", () => {
