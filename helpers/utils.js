@@ -1,18 +1,31 @@
-const removeUser = (socket, usernameStore) => {
-  const temp = usernameStore[socket.id];
-  delete usernameStore[socket.id];
-  return temp;
-};
+const MAX_PLAYERS = 8;
 
-const joinLobby = (socket, lobby) => {
-  const [most_recent] = socket.rooms;
-  if (most_recent !== socket.id) {
-    socket.leave(most_recent);
+const handleJoinLobby = async (io, socket, lobby) => {
+  const sockets = await io.in(lobby).fetchSockets();
+  const numPlayers = sockets.length;
+  if (numPlayers === MAX_PLAYERS) {
+    socket.emit("joinLobbyResponse", {
+      success: false,
+      message: "Lobby is full.",
+    });
+    return;
   }
   socket.join(lobby);
 };
 
+const handleGetLobbyDetails = async (io, socket) => {
+  const [curr_room] = socket.rooms;
+  const sockets = await io.in(curr_room).fetchSockets();
+  const players = sockets.map((s) => socket.username);
+  socket.emit("getLobbyDetailsResponse", { players, lobby: curr_room });
+};
+
+const handleStartGame = async (io, socket) => {
+  io.sockets.in(socket.lobby).emit("gameStart");
+};
+
 module.exports = {
-  removeUser,
-  joinLobby,
+  handleStartGame,
+  handleJoinLobby,
+  handleGetLobbyDetails,
 };
