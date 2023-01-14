@@ -1,14 +1,19 @@
 test_tweet =
   "What two jobs are fine on their own, but suspicious if you put them together?";
 
-const initGame = (gameDataStore, socket) => {
-  // Create a record in gameDataStore
-  gameDataStore[socket.lobby] = {
-    round: {
-      number: 1,
-    },
-    scores: {},
-  };
+const initGame = (gameDataStore, lobbyName) => {
+	for (let i = 0; i < 5; i++) {
+		gameDataStore[lobbyName].totalRoundData.push(
+			{
+				username: "",
+				body: "",
+				avatar: "",
+				retweets: 0,
+				likes: 0	
+			}
+		)
+	}
+
 };
 
 const generateLobbyData = (gameDataStore, lobbyName, username) => {
