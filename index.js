@@ -24,9 +24,18 @@ const gameDataStore = {};
           name: string,
           isHost: boolean,
           score: number,
+          currentRoundAnswer: string,
+          currentRoundVotes: number,
         }
       ],
       currentRound: number,
+      totalRoundData: {
+        username: string,
+        body: string,
+        avatar: string
+        retweets: number,
+        likes: 0	
+      }
     }
   }
 */
@@ -74,6 +83,7 @@ io.on("connection", async (socket) => {
           }
         ],
         currentRound: 0,
+        totalRoundData: [],
       }
     })
   }
@@ -96,7 +106,20 @@ io.on("connection", async (socket) => {
       return socket.emit("gameStart", { success: false });
     }
 
-    initGame(gameDataStore, socket);
+    initGame(gameDataStore, lobbyName); // populates total round data
+
+    const currentRound = gameDataStore[lobbyName].currentRound;
+    const totalRoundData = gameDataStore[lobbyName].totalRoundData;
+
+    const currentRoundData = totalRoundData[currentRound];
+
+    // remove current round data from total round data
+    gameDataStore[lobbyName].totalRoundData.splice(0, 1)
+
+    socket.emit("gameStart", { 
+      success: false,
+      roundData: currentRoundData
+    })
   });
 
   socket.on("receiveAnsweer", () => {});
