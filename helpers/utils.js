@@ -16,7 +16,8 @@ const handleJoinLobby = async (io, socket, lobby) => {
 
   socket.join(lobby);
   socket.emit("joinLobbyResponse", { success: true });
-  socket.emit("userJoinLobby");
+  io.to(lobby).emit("lobbyUpdate", null);
+  return numPlayers;
 };
 
 const handleGetLobbyDetails = async (io, socket) => {
@@ -25,12 +26,12 @@ const handleGetLobbyDetails = async (io, socket) => {
   socket.emit("getLobbyDetailsResponse", { players, lobby: socket.lobby });
 };
 
-const handleRoundStart = (io, socket) => {
-  lobbyAnswerStore[socket.lobby] = {};
+const startRound = (io, socket) => {
   const timerStoreEntry = {
     timer: 30,
     lobby: socket.lobby,
   };
+  lobbyAnswerStore[socket.lobby] = timerStoreEntry;
   timerStoreEntry.intervalId = setInterval(() => {
     if (timerStore[socket.lobby] && timerStore[socket.lobby].timer === 0) {
       io.sockets.in(socket.lobby).emit("round1End");
@@ -48,7 +49,7 @@ const handleRoundAnswer = (io, socket, answer) => {
 
 module.exports = {
   handleRoundAnswer,
-  handleRoundStart,
+  startRound,
   handleJoinLobby,
   handleGetLobbyDetails,
 };

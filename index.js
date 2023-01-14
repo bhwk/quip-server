@@ -17,27 +17,35 @@ const io = socketIO(server, {
 
 const port = process.env.PORT || 3000;
 
+const MAX_PLAYERS = 20;
+
 io.use(async (socket, next) => {
-  const sockets = await io.fetchSockets();
-  const socketAddresses = sockets.map((s) => s.handshake.address);
-  if (socketAddresses.includes(socket.handshake.address)) {
-    return next(new Error("This IP is already connected"));
-  }
-
-  const username = socket.handshake.auth.username;
-
-  if (!username) {
+  if (!socket.handshake.auth.username) {
     return next(new Error("Invalid username"));
   }
-  socket.username = username;
 
-  const lobby = socket.handshake.auth.lobby;
-  await handleJoinLobby(io, socket, lobby);
-  socket.lobby = lobby;
+  socket.username = socket.handshake.auth.username;
+  socket.lobby = socket.handshake.auth.lobby;
+
   next();
 });
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
+  // Handle user joins/creates lobby
+  const socketsInLobby = await io.in(socket.lobby).fetchSockets();
+  const numSocketsInLobby = socketsInLobby.length;
+  if (numSocketsInLobby === 0) {
+    socket.isHost = true;
+  }
+
+  if (numSocketsInLobby === MAX_PLAYERS) {
+    socket.emit("joinLobbyResponse", { success: false });
+    socket.disconnect();
+  }
+
+  socket.join(socket.lobby);
+  io.to(socket.lobby).emit("lobbyUpdate");
+
   // Log User Connection
   console.log(`User ${socket.username} connected to lobby: ${socket.lobby}`);
   // On socket disconnect
@@ -54,7 +62,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("startGame", () => {
-    handleRoundStart(io, socket);
+    startRound(io, socket);
   });
 });
 
