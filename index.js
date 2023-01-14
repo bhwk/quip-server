@@ -1,6 +1,7 @@
 const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
+const { removeUser, joinLobby } = require("./helpers/utils");
 
 const app = express();
 const server = http.createServer(app);
@@ -12,23 +13,28 @@ const port = process.env.PORT || 3000;
 const usernameStore = {};
 
 io.on("connection", (socket) => {
-  console.log(`User connected with socket id: ${socket.id}`);
-  console.log(socket.rooms);
+  console.log(`User connected with socket id: ${socket.id}.`);
   socket.on("disconnect", () => {
-    console.log(usernameStore);
-    delete usernameStore[socket.id];
-    console.log(usernameStore);
-    console.log(`User disconnected with socket id: ${socket.id}`);
+    const dcUser = removeUser(socket, usernameStore);
+    console.log(`User ${dcUser} disconnected.`);
   });
 
   socket.on("joinLobby", (data) => {
     usernameStore[socket.id] = data.username;
-    socket.join(data.lobby);
+    joinLobby(socket, data.lobby);
+    console.log(`User ${data.username} joined lobby: ${data.lobby}`);
 
     // For testing
     socket.to(data.lobby).emit("enteredLobby", {
       message: `${data.username} entered ${data.lobby}`,
     });
+  });
+
+  socket.on("getLobbyDetails", async () => {
+    const [curr_room] = socket.rooms;
+    const sockets = await io.in(curr_room).fetchSockets();
+    const players = sockets.map((s) => usernameStore[s.id]);
+    socket.emit("receiveLobbyDetails", { players, lobby: curr_room });
   });
 });
 
