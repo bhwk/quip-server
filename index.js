@@ -60,7 +60,7 @@ setInterval(() => {
     const players = gameDataStore[lobby].players;
     io.to(lobby).emit("gameUpdate", { timeLeft, players });
 
-    if (lobby.timer.endTimer === 0) {
+    if (lobby.endTimer === 0) {
       const shouldContinue = nextRound(gameDataStore, lobby);
       if (shouldContinue) {
         const currentRound = gameDataStore[lobbyName].currentRound;
