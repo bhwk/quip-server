@@ -113,6 +113,9 @@ io.on("connection", async (socket) => {
         score: 0,
       });
     }
+    else {
+      socket.emit('forceKick')
+    }
   } else {
     if (!gameDataStore[lobbyName]) {
 
