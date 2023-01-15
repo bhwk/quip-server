@@ -54,24 +54,24 @@ io.use(async (socket, next) => {
 
 setInterval(() => {
   for (const lobby in gameDataStore) {
-    lobby.endTimer =
-      lobby.endTimer !== null ? Math.max(lobby.endTimer - 1, 0) : null;
+    gameDataStore[lobby].endTimer = gameDataStore[lobby].endTimer ? Math.max(gameDataStore[lobby].endTimer - 1, 0) : null;
+
     const timeLeft = gameDataStore[lobby].endTimer;
     const players = gameDataStore[lobby].players;
     io.to(lobby).emit("gameUpdate", { timeLeft, players });
 
-    if (lobby.endTimer === 0) {
+    if (gameDataStore[lobby].endTimer === 0) {
       const shouldContinue = nextRound(gameDataStore, lobby);
       if (shouldContinue) {
-        const currentRound = gameDataStore[lobbyName].currentRound;
-        const totalRoundData = gameDataStore[lobbyName].totalRoundData;
+        const currentRound = gameDataStore[lobby].currentRound;
+        const totalRoundData = gameDataStore[lobby].totalRoundData;
 
         const currentRoundData = totalRoundData[currentRound];
 
         // remove current round data from total round data
-        gameDataStore[lobbyName].totalRoundData.splice(0, 1);
+        gameDataStore[lobby].totalRoundData.splice(0, 1);
 
-        gameDataStore[lobbyName].endTimer = 30;
+        gameDataStore[lobby].endTimer = 30;
         io.to(lobby).emit("roundStart", { roundData: currentRoundData });
       } else {
         io.to(lobby).emit("gameEnd", gameDataStore[lobby].players);
@@ -143,6 +143,7 @@ io.on("connection", async (socket) => {
 
     if (!isHost) {
       socket.emit("gameStart", { success: false });
+      return;
     }
 
     initGame(gameDataStore, lobbyName); // populates total round data
