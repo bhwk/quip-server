@@ -37,6 +37,14 @@ const gameDataStore = {};
         retweets: number,
         likes: 0	
       },
+      hasStarted: boolean,
+      currentRoundData: {
+        username: string,
+        body: string,
+        avatar: string
+        retweets: number,
+        likes: 0	
+      }
     }
   }
 */
@@ -63,15 +71,16 @@ setInterval(() => {
     if (gameDataStore[lobby].endTimer === 0) {
       const shouldContinue = nextRound(gameDataStore, lobby);
       if (shouldContinue) {
-        const currentRound = gameDataStore[lobby].currentRound;
         const totalRoundData = gameDataStore[lobby].totalRoundData;
 
-        const currentRoundData = totalRoundData[currentRound];
+        const currentRoundData = totalRoundData[0];
 
         // remove current round data from total round data
         gameDataStore[lobby].totalRoundData.splice(0, 1);
 
         gameDataStore[lobby].endTimer = 30;
+        gameDataStore[lobby].currentRoundData = currentRoundData;
+
         io.to(lobby).emit("roundStart", { roundData: currentRoundData });
       } else {
         io.to(lobby).emit("gameEnd", gameDataStore[lobby].players);
@@ -151,14 +160,18 @@ io.on("connection", async (socket) => {
     const currentRound = gameDataStore[lobbyName].currentRound;
     const totalRoundData = gameDataStore[lobbyName].totalRoundData;
 
-    const currentRoundData = totalRoundData[currentRound];
+    const currentRoundData = totalRoundData[0];
 
     // remove current round data from total round data
     gameDataStore[lobbyName].totalRoundData.splice(0, 1);
 
     gameDataStore[lobbyName].endTimer = 30;
 
-    socket.emit("gameStart", {
+    gameDataStore[lobbyName].hasStarted = true;
+
+    gameDataStore[lobbyName].currentRoundData = currentRoundData;
+
+    io.to(lobbyName).emit("gameStart", {
       success: true,
       roundData: currentRoundData,
     });
@@ -178,9 +191,22 @@ io.on("connection", async (socket) => {
     gameDataStore[lobbyName].players[playerIdx].currentRoundVotes = votes;
   });
 
+  socket.on("forceGameUpdate", () => {
+      const totalRoundData = gameDataStore[lobbyName].totalRoundData;
+
+      socket.emit("forceClientUpdate", {
+        success: true,
+        roundData: gameDataStore[lobbyName].currentRoundData,
+      })
+  })
+
   // On socket disconnect
   socket.on("disconnect", () => {
     console.log(`User ${socket.username} disconnected.`);
+
+    if (!gameDataStore[lobbyName] || !gameDataStore[lobbyName].players || !gameDataStore[lobbyName].players.length) {
+      return;
+    }
 
     const isHost = gameDataStore[lobbyName].players.reduce((acc, u) => {
       return username === u.name && u.isHost;
