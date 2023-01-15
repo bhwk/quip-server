@@ -18,11 +18,22 @@ const initGame = (gameDataStore, lobbyName) => {
 };
 
 const generateLobbyData = (gameDataStore, lobbyName, username) => {
+    const isHost = gameDataStore[lobbyName].players.reduce((acc, u) => {
+      if (u.name === username) {
+        acc = u.isHost;
+      }
+      return acc;
+    }, false);
+
   return {
-    players: gameDataStore[lobbyName].players.map((u) => u.name),
-    isHost: gameDataStore[lobbyName].players.reduce((acc, u) => {
-      return acc || (username === u.name && u.isHost);
-    }, false),
+    players: gameDataStore[lobbyName].players.map((u) => {
+		return {
+			name: u.name,
+			isHost: u.isHost,
+			score: u.score,
+			
+		}
+	}),
     hasStarted: gameDataStore[lobbyName].hasStarted,
   };
 };

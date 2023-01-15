@@ -114,6 +114,8 @@ io.on("connection", async (socket) => {
       });
     }
   } else {
+    if (!gameDataStore[lobbyName]) {
+
     Object.assign(gameDataStore, {
       [lobbyName]: {
         endTimer: null,
@@ -129,6 +131,7 @@ io.on("connection", async (socket) => {
         totalRoundData: [],
       },
     });
+    }
   }
 
   if (gameDataStore[lobbyName].players.length >= MAX_PLAYERS) {
@@ -148,14 +151,18 @@ io.on("connection", async (socket) => {
   console.log(`User ${socket.username} connected to lobby: ${socket.lobby}`);
 
   socket.on("hostStartGame", () => {
-    const isHost = gameDataStore[lobbyName].players.reduce((acc, u) => {
-      return acc || (username === u.name && u.isHost);
-    }, false);
 
-    if (!isHost) {
-      socket.emit("gameStart", { success: false });
-      return;
-    }
+    // const isHost = gameDataStore[lobbyName].players.reduce((acc, u) => {
+    //   if (u.name === username) {
+    //     acc = u.isHost;
+    //   }
+    //   return acc;
+    // }, false);
+
+    // if (!isHost) {
+    //   socket.emit("gameStart", { success: false });
+    //   return;
+    // }
 
     initGame(gameDataStore, lobbyName); // populates total round data
 
@@ -190,7 +197,9 @@ io.on("connection", async (socket) => {
     const playerIdx = gameDataStore[lobbyName].players.findIndex(
       (p) => p.name === username
     );
-    gameDataStore[lobbyName].players[playerIdx].currentRoundVotes = votes;
+    gameDataStore[lobbyName].players[playerIdx].score = votes;
+
+    io.to(lobbyName).emit("lobbyUpdate", generateLobbyData(gameDataStore, lobbyName, username))
   });
 
   socket.on("forceGameUpdate", () => {
@@ -215,8 +224,11 @@ io.on("connection", async (socket) => {
     }
 
     const isHost = gameDataStore[lobbyName].players.reduce((acc, u) => {
-      return username === u.name && u.isHost;
-    });
+      if (u.name === username) {
+        acc = u.isHost;
+      }
+      return acc;
+    }, false);
 
     if (!isHost) {
       gameDataStore[lobbyName].players = gameDataStore[
