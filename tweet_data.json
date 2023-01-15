@@ -1,88 +1,107 @@
 {
-    "tweets": [
-        {
-        "username": "NUKIRUKI",
-        "avatar": "https://pbs.twimg.com/profile_images/1609751229575356416/MvC5_FgF_400x400.jpg",
-        "likes": "151.2K",
-        "retweets": "11.9K",
-        "content": ["this guy is the legit reason why AI art can't be copyrighted", "https://pbs.twimg.com/media/FmSbw-QWIAEv7-5?format=png&name=900x900", "https://pbs.twimg.com/media/FmSbyp5XkAI3hb5?format=jpg&name=large"]
-        },
-        {
-        "username":"DWUhlfelderLaw",
-        "avatar":"https://pbs.twimg.com/profile_images/1501196075406745607/2vR9t6Tx_400x400.jpg",
-        "likes":"132.7K",
-        "retweets":"9,639",
-        "content": ["Thank you @elonmusk for reinstating your friend Andrew Tate", "https://pbs.twimg.com/media/FlMcviLXoAETOWP?format=jpg&name=medium"]
-        },
-        {
-        "username":"elonmusk",
-        "avatar":"https://pbs.twimg.com/profile_images/1590968738358079488/IY9Gx6Ok_400x400.jpg",
-        "likes":"4.7M",
-        "retweets":"671.7K",
-        "content":["Next I’m buying Coca-Cola to put the cocaine back in"]
-        },
-        {
-        "username":"nypost",
-        "avatar":"https://pbs.twimg.com/profile_images/966372680306868224/60wfGe9e_400x400.jpg",
-        "likes":"6,766",
-        "retweets":"1,062",
-        "content":["Boy born with two penises has the larger one chopped off by doctors", "https://pbs.twimg.com/media/FQzDPLMWUAUYjzg?format=jpg&name=small"]
-        },
-        {
-        "username":"tommyinnit",
-        "avatar":"https://pbs.twimg.com/profile_images/1535706274049957888/4PfG6S0y_400x400.jpg",
-        "likes":"128.2K",
-        "retweets":"2,110",
-        "content":["THE LAW DOES NOT APPLY TO ME. I AM A YOUTUBER."]
-        },
-        {
-        "username":"DrDisrespect",
-        "avatar":"https://pbs.twimg.com/profile_images/1588240524401524741/9CW7ljgP_400x400.jpg",
-        "likes":"9,400",
-        "retweets":"820",
-        "content":["There's one thing I love about myself... Everything."]
-        },
-        {
-        "username":"REALMizkif",
-        "avatar":"https://pbs.twimg.com/profile_images/1386897439899127811/X92asQNU_400x400.jpg",
-        "likes":"32.6K",
-        "retweets":"825",
-        "content":["Streamers are all garbage human beings"]
-        },
-        {
-        "username":"michaelreeves",
-        "avatar":"https://pbs.twimg.com/profile_images/1275396462076022786/ZsFFlLrH_400x400.jpg",
-        "likes":"95.4K",
-        "retweets":"4,494",
-        "content":["\"Are you okay babe? You barely touched your Boneless Bangus\"", "https://pbs.twimg.com/media/FYMmjXwVQAE1nU2?format=jpg&name=medium"]
-        },
-        {
-        "username":"Xbox",
-        "avatar":"https://pbs.twimg.com/profile_images/1613316350797287427/VxFm0xNo_400x400.jpg",
-        "likes":"6,606",
-        "retweets":"428",
-        "content":["If someone tells you that they like games, ✨don’t✨ ask them to qualify it"]
-        },
-        {
-        "username":"MoistCr1TiKaL",
-        "avatar":"https://pbs.twimg.com/profile_images/873233421992112129/TwalrDiR_400x400.jpg",
-        "likes":"141.8K",
-        "retweets":"10.7K",
-        "content":["All this milk and cookies I left out for Santa and that dirty bastard still chose to eat my ass"]
-        },
-        {
-        "username":"h3h3productions",
-        "avatar":"https://pbs.twimg.com/profile_images/1605918138943426561/lEsaToOa_400x400.jpg",
-        "likes":"15.6K",
-        "retweets":"872",
-        "content":["The matrix just made me shit my pants"]
-        },
-        {
-        "username":"DolanDark",
-        "avatar":"https://pbs.twimg.com/profile_images/1289224406762307585/eS9E9vPz_400x400.jpg",
-        "likes":"56.6K",
-        "retweets":"1,840",
-        "content":["Yeah everything happening right now is awful and all, but removing PogChamp was a step too far"]
-        }
-    ]
+  "tweets": [
+    {
+      "username": "NUKIRUKI",
+      "avatar": "https://pbs.twimg.com/profile_images/1609751229575356416/MvC5_FgF_400x400.jpg",
+      "likes": "151.2K",
+      "retweets": "11.9K",
+      "content": [
+        "this guy is the legit reason why ________",
+        "https://pbs.twimg.com/media/FmSbw-QWIAEv7-5?format=png&name=900x900",
+        "https://pbs.twimg.com/media/FmSbyp5XkAI3hb5?format=jpg&name=large"
+      ]
+    },
+    {
+      "username": "DWUhlfelderLaw",
+      "avatar": "https://pbs.twimg.com/profile_images/1501196075406745607/2vR9t6Tx_400x400.jpg",
+      "likes": "132.7K",
+      "retweets": "9,639",
+      "content": [
+        "Thank you @elonmusk for ________ your friend Andrew Tate",
+        "https://pbs.twimg.com/media/FlMcviLXoAETOWP?format=jpg&name=medium"
+      ]
+    },
+    {
+      "username": "elonmusk",
+      "avatar": "https://pbs.twimg.com/profile_images/1590968738358079488/IY9Gx6Ok_400x400.jpg",
+      "likes": "4.7M",
+      "retweets": "671.7K",
+      "content": ["Next I’m ________ to put the cocaine back in"]
+    },
+    {
+      "username": "nypost",
+      "avatar": "https://pbs.twimg.com/profile_images/966372680306868224/60wfGe9e_400x400.jpg",
+      "likes": "6,766",
+      "retweets": "1,062",
+      "content": [
+        "Boy born with ________ has the larger one chopped off by doctors",
+        "https://pbs.twimg.com/media/FQzDPLMWUAUYjzg?format=jpg&name=small"
+      ]
+    },
+    {
+      "username": "tommyinnit",
+      "avatar": "https://pbs.twimg.com/profile_images/1535706274049957888/4PfG6S0y_400x400.jpg",
+      "likes": "128.2K",
+      "retweets": "2,110",
+      "content": ["THE LAW DOES NOT APPLY TO ME. ________."]
+    },
+    {
+      "username": "DrDisrespect",
+      "avatar": "https://pbs.twimg.com/profile_images/1588240524401524741/9CW7ljgP_400x400.jpg",
+      "likes": "9,400",
+      "retweets": "820",
+      "content": ["There's one thing I love about myself... ________."]
+    },
+    {
+      "username": "REALMizkif",
+      "avatar": "https://pbs.twimg.com/profile_images/1386897439899127811/X92asQNU_400x400.jpg",
+      "likes": "32.6K",
+      "retweets": "825",
+      "content": ["________ are all garbage human beings"]
+    },
+    {
+      "username": "michaelreeves",
+      "avatar": "https://pbs.twimg.com/profile_images/1275396462076022786/ZsFFlLrH_400x400.jpg",
+      "likes": "95.4K",
+      "retweets": "4,494",
+      "content": [
+        "\"Are you okay babe? You barely touched your ________.\"",
+        "https://pbs.twimg.com/media/FYMmjXwVQAE1nU2?format=jpg&name=medium"
+      ]
+    },
+    {
+      "username": "Xbox",
+      "avatar": "https://pbs.twimg.com/profile_images/1613316350797287427/VxFm0xNo_400x400.jpg",
+      "likes": "6,606",
+      "retweets": "428",
+      "content": [
+        "If someone tells you ________, ✨don’t✨ ask them to qualify it"
+      ]
+    },
+    {
+      "username": "MoistCr1TiKaL",
+      "avatar": "https://pbs.twimg.com/profile_images/873233421992112129/TwalrDiR_400x400.jpg",
+      "likes": "141.8K",
+      "retweets": "10.7K",
+      "content": [
+        "All this milk and cookies I left out for Santa and that dirty bastard still chose to ________"
+      ]
+    },
+    {
+      "username": "h3h3productions",
+      "avatar": "https://pbs.twimg.com/profile_images/1605918138943426561/lEsaToOa_400x400.jpg",
+      "likes": "15.6K",
+      "retweets": "872",
+      "content": ["The matrix just made me ________"]
+    },
+    {
+      "username": "DolanDark",
+      "avatar": "https://pbs.twimg.com/profile_images/1289224406762307585/eS9E9vPz_400x400.jpg",
+      "likes": "56.6K",
+      "retweets": "1,840",
+      "content": [
+        "Yeah everything happening right now is awful and all, but removing ________ was a step too far"
+      ]
+    }
+  ]
 }
