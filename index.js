@@ -81,6 +81,7 @@ setInterval(() => {
         gameDataStore[lobby].totalRoundData.splice(0, 1);
 
         gameDataStore[lobby].endTimer = 30;
+        
         gameDataStore[lobby].currentRoundData = currentRoundData;
 
         io.to(lobby).emit("roundStart", { roundData: currentRoundData });
@@ -194,6 +195,9 @@ io.on("connection", async (socket) => {
       (p) => p.name === username
     );
     gameDataStore[lobbyName].players[playerIdx].currentRoundAnswer = answer;
+    gameDataStore[lobbyName].players[playerIdx].timeAnswered = endTimer;
+    
+
   });
 
   socket.on("receiveVotes", (target) => {
@@ -233,17 +237,17 @@ io.on("connection", async (socket) => {
       return acc;
     }, false);
 
-    if (!isHost) {
-      gameDataStore[lobbyName].players = gameDataStore[
-        lobbyName
-      ].players.filter((u) => u.name !== username);
+    // if (!isHost) {
+    //   gameDataStore[lobbyName].players = gameDataStore[
+    //     lobbyName
+    //   ].players.filter((u) => u.name !== username);
 
-      io.to(socket.lobby).emit(
-        "lobbyUpdate",
-        generateLobbyData(gameDataStore, lobbyName, username)
-      );
-      return;
-    }
+    //   io.to(socket.lobby).emit(
+    //     "lobbyUpdate",
+    //     generateLobbyData(gameDataStore, lobbyName, username)
+    //   );
+    //   return;
+    // }
   });
 });
 
