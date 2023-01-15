@@ -193,11 +193,11 @@ io.on("connection", async (socket) => {
     gameDataStore[lobbyName].players[playerIdx].currentRoundAnswer = answer;
   });
 
-  socket.on("receiveVotes", (votes) => {
+  socket.on("receiveVotes", (target) => {
     const playerIdx = gameDataStore[lobbyName].players.findIndex(
-      (p) => p.name === username
+      (p) => p.name === target
     );
-    gameDataStore[lobbyName].players[playerIdx].score = votes;
+    gameDataStore[lobbyName].players[playerIdx].score += 1;
 
     io.to(lobbyName).emit("lobbyUpdate", generateLobbyData(gameDataStore, lobbyName, username))
   });
