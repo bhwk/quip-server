@@ -21,9 +21,9 @@ const generateLobbyData = (gameDataStore, lobbyName, username) => {
   return {
     players: gameDataStore[lobbyName].players.map((u) => u.name),
     isHost: gameDataStore[lobbyName].players.reduce((acc, u) => {
-      return username === u.name && u.isHost;
+      return acc || (username === u.name && u.isHost);
     }, false),
-	hasStarted: gameDataStore[lobbyName].hasStarted,
+    hasStarted: gameDataStore[lobbyName].hasStarted,
   };
 };
 
@@ -33,11 +33,11 @@ const nextRound = (gameDataStore, lobbyName) => {
     return false;
   }
   for (player in gameDataStore[lobbyName].players) {
-	gameDataStore[lobbyName].players[player].currentRoundAnswer = null;
-	gameDataStore[lobbyName].players[player].currentRoundVotes = null;
+    gameDataStore[lobbyName].players[player].currentRoundAnswer = null;
+    gameDataStore[lobbyName].players[player].currentRoundVotes = null;
   }
 
-  console.log(gameDataStore[lobbyName].players)
+  console.log(gameDataStore[lobbyName].players);
   return true;
 };
 

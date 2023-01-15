@@ -62,7 +62,9 @@ io.use(async (socket, next) => {
 
 setInterval(() => {
   for (const lobby in gameDataStore) {
-    gameDataStore[lobby].endTimer = gameDataStore[lobby].endTimer ? Math.max(gameDataStore[lobby].endTimer - 1, 0) : null;
+    gameDataStore[lobby].endTimer = gameDataStore[lobby].endTimer
+      ? Math.max(gameDataStore[lobby].endTimer - 1, 0)
+      : null;
 
     const timeLeft = gameDataStore[lobby].endTimer;
     const players = gameDataStore[lobby].players;
@@ -97,7 +99,7 @@ io.on("connection", async (socket) => {
   if (gameDataStore[lobbyName]) {
     const containsPlayer = gameDataStore[lobbyName].players.reduce(
       (acc, playerObj) => {
-        return playerObj.name === socket.username;
+        return acc || playerObj.name === socket.username;
       },
       false
     );
@@ -147,7 +149,7 @@ io.on("connection", async (socket) => {
 
   socket.on("hostStartGame", () => {
     const isHost = gameDataStore[lobbyName].players.reduce((acc, u) => {
-      return username === u.name && u.isHost;
+      return acc || (username === u.name && u.isHost);
     }, false);
 
     if (!isHost) {
@@ -192,19 +194,23 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("forceGameUpdate", () => {
-      const totalRoundData = gameDataStore[lobbyName].totalRoundData;
+    const totalRoundData = gameDataStore[lobbyName].totalRoundData;
 
-      socket.emit("forceClientUpdate", {
-        success: true,
-        roundData: gameDataStore[lobbyName].currentRoundData,
-      })
-  })
+    socket.emit("forceClientUpdate", {
+      success: true,
+      roundData: gameDataStore[lobbyName].currentRoundData,
+    });
+  });
 
   // On socket disconnect
   socket.on("disconnect", () => {
     console.log(`User ${socket.username} disconnected.`);
 
-    if (!gameDataStore[lobbyName] || !gameDataStore[lobbyName].players || !gameDataStore[lobbyName].players.length) {
+    if (
+      !gameDataStore[lobbyName] ||
+      !gameDataStore[lobbyName].players ||
+      !gameDataStore[lobbyName].players.length
+    ) {
       return;
     }
 
