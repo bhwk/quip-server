@@ -195,7 +195,7 @@ io.on("connection", async (socket) => {
       (p) => p.name === username
     );
     gameDataStore[lobbyName].players[playerIdx].currentRoundAnswer = answer;
-    gameDataStore[lobbyName].players[playerIdx].timeAnswered = endTimer;
+    gameDataStore[lobbyName].players[playerIdx].timeAnswered = gameDataStore[lobbyName].endTimer;
     
 
   });
